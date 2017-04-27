@@ -6,15 +6,27 @@ import (
     "net"
     "github.com/gmallard/stompngo"
     "strconv"
+    "time"
+    "os"
+    "log"
+    "runtime"
 )
 
 func main() {
 
+    runtime.GOMAXPROCS(runtime.NumCPU() * 2)
     var baseconn net.Conn
     var stompconn *stompngo.Connection
     var errinfo error
     var ch stompngo.Headers
 
+    logfile,err:=os.OpenFile("test.log",os.O_RDWR|os.O_CREATE,0666)
+    if err!=nil{
+        fmt.Printf("%s\r\n",err.Error())
+        os.Exit(-1)
+    }
+    defer logfile.Close()
+    logger:=log.New(logfile,"\r\n",log.Ldate|log.Ltime|log.Llongfile)
     fmt.Println("start...")
 
     //创建原始套接字
@@ -44,15 +56,43 @@ func main() {
     sh := stompngo.Headers{"destination", "/queue/shaoyong-test", "ack", "client", "id", id}
     sh = sh.Add("persistent", "true")
 
-    for i:=1; i<1000000; i++ {
-        strmsg := "消息内容" + strconv.Itoa(i)
-        e := stompconn.Send(sh,strmsg)
-        if e != nil {
-            fmt.Println(e.Error())
-        } else {
-            fmt.Println("send ok")
-        }
+    //分成几个线程
+    var msgCnt int64 = 1000000
+    fmt.Println(msgCnt)
+    var threadCnt int = 10
+    mychan := make(chan bool,threadCnt)
+
+    reqperthread := msgCnt / int64(threadCnt)
+
+    timestamp := time.Now().Unix()
+    tm := time.Unix(timestamp, 0)
+    logger.Println("开始时间：",tm.Format("2006-01-02 03:04:05 PM"))
+
+    for index:=0; index< threadCnt; index++ {
+        go func(index int) {
+            for i:=0; int64(i)<reqperthread; i++ {
+                strmsg := "消息内容" + strconv.Itoa(i)
+                //如果需要ACK 必须"message-id"有值
+                sh.Add("message-id",strmsg)
+                e := stompconn.Send(sh,strmsg)
+                if e != nil {
+                    fmt.Println(e.Error())
+                } else {
+                    //fmt.Println("send ok")
+                }
+            }
+            mychan <- true
+        } (index)
     }
+
+    for i:=0; i<threadCnt; i++ {
+        <-mychan
+    }
+    timestamp = time.Now().Unix()
+    tm = time.Unix(timestamp, 0)
+    logger.Println("结束时间：",tm.Format("2006-01-02 03:04:05 PM"))
+    fmt.Println("发送完毕。。。。")
+
 
     errinfo = stompconn.Disconnect(stompngo.Headers{})
     if errinfo != nil {

@@ -5,15 +5,38 @@ import (
     "fmt"
     "net"
     "github.com/gmallard/stompngo"
+    "os"
+    "log"
+    "time"
 )
-
+var perthread int64 = 1000000/10
+var mychan chan bool
 func main() {
+    mychan = make(chan bool,10)
+    for i:=0; i<10; i++ {
+        go test()
+    }
+    for i:=0; i<10; i++ {
+        <-mychan
+    }
+    fmt.Println("完成")
+}
+
+func test() {
 
     var baseconn net.Conn
     var stompconn *stompngo.Connection
     var errinfo error
     var ch stompngo.Headers
     var msgdata stompngo.MessageData
+
+    logfile,err:=os.OpenFile("test.log",os.O_RDWR|os.O_CREATE,0666)
+    if err!=nil{
+        fmt.Printf("%s\r\n",err.Error())
+        os.Exit(-1)
+    }
+    defer logfile.Close()
+    logger:=log.New(logfile,"\r\n",log.Ldate|log.Ltime|log.Llongfile)
 
     fmt.Println("start...")
 
@@ -32,7 +55,6 @@ func main() {
     ch.Add("accept-version",stompngo.SPL_10)
     ch.Add("host","192.168.10.166")
     ch.Add("heart-beat","0,0")
-
     stompconn,errinfo = stompngo.Connect(baseconn,ch)
     if errinfo != nil {
         fmt.Println("stompngo.Connect failed:",errinfo.Error())
@@ -40,46 +62,37 @@ func main() {
         fmt.Println("stompngo connect ok")
     }
 
-
     //sh := stompngo.Headers{"destination", "/queue/shaoyong-test", "ack", "auto"}
     sh := stompngo.Headers{"destination", "/queue/shaoyong-test", "ack", "client"}
     //sh = sh.Add("id", id) 1.1 1.2版本需要，1.0版本不需要
-
     msgchan, e := stompconn.Subscribe(sh)
     if e != nil {
         fmt.Println("订阅操作失败")
     }
 
+    /*
+
     sbh := stompngo.Headers{}
     // stomp 1.0版本
     id := stompngo.Uuid()
     sbh.Add("id",id)
-    sbh.Add("destination", "/queue/shaoyong-test")
+    sbh.Add("destination", "/queue/shaoyong-test")*/
 
+    timestamp := time.Now().Unix()
+    tm := time.Unix(timestamp, 0)
+    logger.Println("开始时间：",tm.Format("2006-01-02 03:04:05 PM"))
 
-    for {
+    icnt :=0
+    for i:=0; int64(i)<perthread; i++{
         select {
         case msgdata= <-msgchan:
         case msgdata= <-stompconn.MessageData:
-            fmt.Println("conn.Session:",stompconn.Session())
+            //fmt.Println("conn.Session:",stompconn.Session())
         }
         if msgdata.Error != nil {
-            fmt.Println("conn.Session:",stompconn.Session()," err:",msgdata.Error.Error())
+            //fmt.Println("conn.Session:",stompconn.Session()," err:",msgdata.Error.Error())
         } else {
             wh := msgdata.Message.Headers
-            for j := 0; j < len(wh)-1; j += 2 {
-                fmt.Printf("%stag:%s connsess:%s Header:%s:%s\n", stompconn.Session(), wh[j], wh[j+1])
-            }
-            //最大不能超过1024长度
-            fmt.Println("msgdata:",string(msgdata.Message.Body))
-
-            if cv, ok := sbh.Contains(stompngo.HK_RECEIPT); ok {
-                sbh.Add(stompngo.HK_RECEIPT, cv)
-            }
-            //获取收到的数据 找到message-id进行ACK回执
-            fmt.Println("message-id:",msgdata.Message.Headers.Value("message-id"))
-
-
             ah := stompngo.Headers{}
             ah = ah.Add("message-id", wh.Value("message-id"))
             if cv, ok := wh.Contains(stompngo.HK_RECEIPT); ok {
@@ -89,21 +102,25 @@ func main() {
             if e != nil {
                 fmt.Println("err info:",e.Error())
             } else {
-                fmt.Println("ack success")
+                //fmt.Println("ack success")
+                icnt++
             }
-
-
-
             //time.Sleep(10*time.Second)
         }
     }
+    timestamp = time.Now().Unix()
+    tm = time.Unix(timestamp, 0)
+    fmt.Println("结束时间：",tm.Format("2006-01-02 03:04:05 PM"),"总笔数:",icnt)
+    logger.Println("结束时间：",tm.Format("2006-01-02 03:04:05 PM"))
 
 
 
-    e = stompconn.Unsubscribe(sbh)
-    if e != nil {
-        fmt.Println("err:",e.Error())
-    }
+
+
+    //e = stompconn.Unsubscribe(sbh)
+    //if e != nil {
+    //    fmt.Println("err:",e.Error())
+    //}
     e = stompconn.Disconnect(stompngo.Headers{})
     if e != nil {
         fmt.Println("err:",e.Error())
@@ -113,6 +130,6 @@ func main() {
         fmt.Println("err:",e.Error())
     }
 
-
+    mychan<-true
 }
 
