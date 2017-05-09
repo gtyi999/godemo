@@ -1,15 +1,23 @@
 package signinstance
 
-import "fmt"
+import (
+    "fmt"
+    "sync"
+)
 
 type MyClass struct{
 }
 
 var myapp *MyClass
+var lock *sync.Mutex = &sync.Mutex{}
 
 func GetInstance() *MyClass {
     if myapp == nil {
-        myapp = &MyClass{}
+        lock.Lock()
+        defer lock.Unlock()
+        if myapp == nil {
+            myapp = &MyClass {}
+        }
     }
     return myapp
 }
