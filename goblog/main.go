@@ -24,7 +24,7 @@ func main() {
     applog.Debug("this is a debug test2")
 
     r := httprouter.New()
-    r.GET("/adduser",C.Regist)
-    r.GET("/",C.Index)
+    r.GET("/adduser",C.UserRegist)
+    r.GET("/",C.HomeIndex)
     http.ListenAndServe(":8888",r)
 }
