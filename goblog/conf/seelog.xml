@@ -4,7 +4,7 @@
             <console />
         </filter>
         <filter levels="debug">
-            <file path="E:/debug.txt" />
+            <file path="/home/luv/log/debug.txt" />
         </filter>
     </outputs>
     <formats>
