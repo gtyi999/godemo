@@ -1,4 +1,4 @@
-package xorm
+package models
 
 type WpTermRelationships struct {
 	ObjectId       int64 `xorm:"not null pk default 0 BIGINT(20)"`

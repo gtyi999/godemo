@@ -2,7 +2,6 @@ package models
 
 import (
     "fmt"
-    M "github.com/qqqc/godemo/goblog/models/xorm"
     "github.com/go-xorm/xorm"
     _ "github.com/go-sql-driver/mysql"
     "log"
@@ -34,13 +33,45 @@ func init() {
 
 }
 
-func AddUser(users M.WpUsers)(id int64, err error) {
+func NewWpPosts() *WpPosts {
+    return &WpPosts{}
+}
+func (this *WpPosts)Add()(irows int64, err error) {
+    irows,err = APPDB.Insert(this)
+    return
+}
+func (this *WpPosts)GetArticles(nums int)(articles []*WpPosts, err error) {
+
+
+    e := APPDB.Limit(nums).Iterate(new(WpPosts), func(idx int, bean interface{}) error {
+        articles = append(articles,bean.(*WpPosts) )
+        fmt.Println(bean.(*WpPosts).Id)
+        //articles[idx] = bean.(*WpPosts)
+        return nil
+    })
+
+    if e!=nil {
+        fmt.Println("Get function")
+        return nil, e
+    } else {
+        return
+    }
+}
+
+
+
+
+
+
+
+
+func AddUser(users WpUsers)(id int64, err error) {
     id,err = APPDB.Insert(users)
     return
 }
 
-func GetUserById(id int64)*M.WpUsers {
-    var user M.WpUsers
+func GetUserById(id int64)*WpUsers {
+    var user WpUsers
     if ok,e:=APPDB.ID(id).Get(&user); e!=nil{
         return nil
     } else {
@@ -52,3 +83,4 @@ func GetUserById(id int64)*M.WpUsers {
     }
     return nil
 }
+

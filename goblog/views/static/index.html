@@ -24,6 +24,14 @@
     
 </head>
 <body>
+
+{{.retcode}}
+{{.retmsg}}
+{{range .postlist}}
+ID[{{.Id}}] TIME[{{.PostModified}}] <br>
+{{end}}
+
+
     <header>
         <div class="widewrapper masthead">
             <div class="container">

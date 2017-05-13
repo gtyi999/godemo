@@ -3,7 +3,6 @@ package controller
 import (
     "net/http"
     "github.com/julienschmidt/httprouter"
-    "github.com/qqqc/godemo/goblog/models/xorm"
     "github.com/qqqc/godemo/goblog/models"
     "fmt"
     "time"
@@ -22,7 +21,7 @@ func UserIndex(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 //用户注册页面 http://localhost/u/regist
 func UserRegist(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 
-    udata :=xorm.WpUsers{UserLogin:"luv",UserPass:"331234958", UserNicename:"abner",UserEmail:"331234958@qq.com", UserUrl:"http://www.web012.com", UserRegistered:time.Now(),UserActivationKey:"#aadf@$",UserStatus:0,DisplayName:"小辉"}
+    udata :=models.WpUsers{UserLogin:"luv",UserPass:"331234958", UserNicename:"abner",UserEmail:"331234958@qq.com", UserUrl:"http://www.web012.com", UserRegistered:time.Now(),UserActivationKey:"#aadf@$",UserStatus:0,DisplayName:"小辉"}
     id,e := models.AddUser(udata)
     if e==nil {
         fmt.Fprint(w,"add success id",id)

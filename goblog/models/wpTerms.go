@@ -1,4 +1,4 @@
-package xorm
+package models
 
 type WpTerms struct {
 	TermId    int64  `xorm:"not null pk autoincr BIGINT(20)"`

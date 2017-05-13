@@ -1,4 +1,4 @@
-package xorm
+package models
 
 type WpTermTaxonomy struct {
 	TermTaxonomyId int64  `xorm:"not null pk autoincr BIGINT(20)"`

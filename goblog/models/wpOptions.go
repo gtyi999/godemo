@@ -1,4 +1,4 @@
-package xorm
+package models
 
 type WpOptions struct {
 	OptionId    int64  `xorm:"not null pk autoincr BIGINT(20)"`

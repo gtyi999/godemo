@@ -1,4 +1,4 @@
-package xorm
+package models
 
 import (
 	"time"
