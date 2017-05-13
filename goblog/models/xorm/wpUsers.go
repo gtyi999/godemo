@@ -11,7 +11,7 @@ type WpUsers struct {
 	UserNicename      string    `xorm:"not null default '' index VARCHAR(50)"`
 	UserEmail         string    `xorm:"not null default '' VARCHAR(100)"`
 	UserUrl           string    `xorm:"not null default '' VARCHAR(100)"`
-	UserRegistered    time.Time `xorm:"DATETIME"`
+	UserRegistered    time.Time `xorm:"not null default 'CURRENT_TIMESTAMP' TIMESTAMP"`
 	UserActivationKey string    `xorm:"not null default '' VARCHAR(255)"`
 	UserStatus        int       `xorm:"not null default 0 INT(11)"`
 	DisplayName       string    `xorm:"not null default '' VARCHAR(250)"`

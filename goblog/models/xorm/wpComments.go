@@ -11,8 +11,8 @@ type WpComments struct {
 	CommentAuthorEmail string    `xorm:"not null default '' index VARCHAR(100)"`
 	CommentAuthorUrl   string    `xorm:"not null default '' VARCHAR(200)"`
 	CommentAuthorIp    string    `xorm:"not null default '' VARCHAR(100)"`
-	CommentDate        time.Time `xorm:"DATETIME"`
-	CommentDateGmt     time.Time `xorm:"index(comment_approved_date_gmt) index DATETIME"`
+	CommentDate        time.Time `xorm:"not null default 'CURRENT_TIMESTAMP' TIMESTAMP"`
+	CommentDateGmt     time.Time `xorm:"not null default 'CURRENT_TIMESTAMP' index(comment_approved_date_gmt) index TIMESTAMP"`
 	CommentContent     string    `xorm:"not null TEXT"`
 	CommentKarma       int       `xorm:"not null default 0 INT(11)"`
 	CommentApproved    string    `xorm:"not null default '1' index(comment_approved_date_gmt) VARCHAR(20)"`

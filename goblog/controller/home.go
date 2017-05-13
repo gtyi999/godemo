@@ -15,7 +15,27 @@ import (
 
 // 网站首页
 func HomeIndex(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-    tplpath := ThemePath + "index.tpl"
+    tplpath := ThemePath + "index.html"
+    fmt.Println(tplpath)
+    tmpl, _ := template.ParseFiles(tplpath)
+    datamap := make(map[string]interface{})
+    datamap["Name"] = "liuhui"
+    tmpl.Execute(w, datamap)
+}
+
+// 关于页面
+func HomeAbout(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+    tplpath := ThemePath + "about.html"
+    fmt.Println(tplpath)
+    tmpl, _ := template.ParseFiles(tplpath)
+    datamap := make(map[string]interface{})
+    datamap["Name"] = "liuhui"
+    tmpl.Execute(w, datamap)
+}
+
+// 联系人页面
+func HomeContact(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+    tplpath := ThemePath + "contact.html"
     fmt.Println(tplpath)
     tmpl, _ := template.ParseFiles(tplpath)
     datamap := make(map[string]interface{})
