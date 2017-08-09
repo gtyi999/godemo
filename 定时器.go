@@ -7,7 +7,7 @@ import (
 
 func deal(donetype chan int) {
 	fmt.Println(time.Now(), " waitting")
-	time.Sleep(time.Second * 2500)
+	time.Sleep(time.Second * 3)
 	donetype <- 2
 	fmt.Println(time.Now(), " done")
 }
@@ -30,5 +30,6 @@ func main() {
 	} else {
 		fmt.Println("正常结束")
 	}
-	time.Sleep(time.Second * 20)
+	//time.Sleep(time.Second * 11)
+	fmt.Println("结束时间:",time.Now())
 }
