@@ -1,0 +1,34 @@
+package main
+
+import (
+	"time"
+	"log"
+	"errors"
+)
+
+func main() {
+
+
+	err := DoSomethingWithTimeout(func() {
+		time.Sleep(10 * time.Second)
+		log.Println("comlete")
+	}, 3*time.Second)
+
+	log.Println(err)
+}
+
+func DoSomethingWithTimeout(do func(), timeout time.Duration) error {
+
+	timeOut := make(chan error, 1)
+	time.AfterFunc(timeout, func() {
+		log.Println("time out")
+		timeOut <- errors.New("timeOutError")
+	})
+
+	go func() {
+		do()
+	}()
+	timeOutError := <-timeOut
+
+	return timeOutError
+}

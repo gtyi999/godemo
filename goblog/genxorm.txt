@@ -1,0 +1,5 @@
+
+
+./xorm reverse mysql root:111111@(172.17.0.2:3306)/wpdb?charset=utf8 templates/goxorm /home/luv/goproject/src/github.com/qqqc/godemo/goblog/models/xorm
+
+
